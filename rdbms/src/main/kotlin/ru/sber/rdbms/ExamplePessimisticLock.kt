@@ -14,7 +14,7 @@ fun main() {
     val connection = DriverManager.getConnection(
         "jdbc:postgresql://localhost:5432/db",
         "postgres",
-        "12345"
+        "postgres"
     )
     connection.use { conn ->
         val autoCommit = conn.autoCommit

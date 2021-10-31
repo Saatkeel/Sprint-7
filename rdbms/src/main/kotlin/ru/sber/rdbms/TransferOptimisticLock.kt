@@ -8,7 +8,7 @@ class TransferOptimisticLock {
     val connection = DriverManager.getConnection(
         "jdbc:postgresql://localhost:5432/db",
         "postgres",
-        "12345"
+        "postgres"
     )
     fun transfer(accountId1: Long, accountId2: Long, amount: Long) {
         var version1: Long
