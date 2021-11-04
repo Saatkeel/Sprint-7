@@ -26,7 +26,7 @@ fun main() {
             }
             val prepareStatement2 = conn.prepareStatement("update account1 set amount = amount - 100 where id = 1")
             prepareStatement2.use { statement ->
-                statement.executeQuery()
+                statement.executeUpdate()
             }
             conn.commit()
         } catch (exception: SQLException) {
