@@ -107,7 +107,7 @@
                     <changeLogFile>src/main/resources/db.changelog-master.yaml</changeLogFile>
                     <url>jdbc:postgresql://localhost:5432/db</url>
                     <username>postgres</username>
-                    <password>postgres</password>
+                    <password>12345</password>
                 </configuration>
             </plugin>
         </plugins>

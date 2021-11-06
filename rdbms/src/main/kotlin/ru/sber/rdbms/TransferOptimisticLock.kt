@@ -17,8 +17,9 @@ class TransferOptimisticLock {
             val autoCommit = conn.autoCommit
             try {
                 conn.autoCommit = false
-                val prepareStatement1 = conn.prepareStatement("select * from account1 where id = $accountId1")
+                val prepareStatement1 = conn.prepareStatement("select * from account1 where id = ?")
                 prepareStatement1.use { statement ->
+                    statement.setLong(1,accountId1)
                     val resultSet = statement.executeQuery()
                     resultSet.use {
                         it.next()
@@ -27,8 +28,9 @@ class TransferOptimisticLock {
                             throw CustomException("Запрос вернул более 1 записи")
                     }
                 }
-                val prepareStatement2 = conn.prepareStatement("select * from account1 where id = $accountId2")
+                val prepareStatement2 = conn.prepareStatement("select * from account1 where id = ?")
                 prepareStatement2.use { statement ->
+                    statement.setLong(1,accountId2)
                     val resultSet = statement.executeQuery()
                     resultSet.use {
                         it.next()
@@ -38,19 +40,27 @@ class TransferOptimisticLock {
                     }
                 }
                 val prepareStatement3 = conn.prepareStatement("update account1 set " +
-                        "amount = amount - $amount, version = $version1 + 1" +
-                        "where id = $accountId1" +
-                        "and version = $version1")
+                        "amount = amount - ?, version = ? + 1" +
+                        "where id = ?" +
+                        "and version = ?")
                 prepareStatement3.use { statement ->
+                    statement.setLong(1,amount)
+                    statement.setLong(2,version1)
+                    statement.setLong(3,accountId1)
+                    statement.setLong(4,version1)
                     val resultSet = statement.executeUpdate()
                     if(resultSet==0)
                         throw CustomException("Запись была изменена другим пользователем")
                 }
                 val prepareStatement4 = conn.prepareStatement("update account1 set " +
-                        "amount = amount + $amount, version = $version2+1 " +
-                        "where id = $accountId2" +
-                        "and version = $version2")
+                        "amount = amount + ?, version = ?+1 " +
+                        "where id = ?" +
+                        "and version = ?")
                 prepareStatement4.use { statement ->
+                    statement.setLong(1,amount)
+                    statement.setLong(2,version2)
+                    statement.setLong(3,accountId2)
+                    statement.setLong(4,version2)
                     val resultSet = statement.executeUpdate()
                     if(resultSet==0)
                         throw CustomException("Запись была изменена другим пользователем")

@@ -7,7 +7,7 @@ class TransferConstraint {
     val connection = DriverManager.getConnection(
         "jdbc:postgresql://localhost:5432/db",
         "postgres",
-        "postgres"
+        "12345"
     )
     fun transfer(accountId1: Long, accountId2: Long, amount: Long) {
         connection.use { conn ->
@@ -22,12 +22,16 @@ class TransferConstraint {
 //                prepareStatement2.use { statement ->
 //                    statement.executeQuery()
 //                }
-                val prepareStatement3 = conn.prepareStatement("update account1 set amount = amount - $amount where id = $accountId1")
+                val prepareStatement3 = conn.prepareStatement("update account1 set amount = amount - ? where id = ?")
                 prepareStatement3.use { statement ->
+                    statement.setLong(1,amount)
+                    statement.setLong(2,accountId1)
                     statement.executeUpdate()
                 }
-                val prepareStatement4 = conn.prepareStatement("update account1 set amount = amount + $amount where id = $accountId2")
+                val prepareStatement4 = conn.prepareStatement("update account1 set amount = amount + ? where id = ?")
                 prepareStatement4.use { statement ->
+                    statement.setLong(1,amount)
+                    statement.setLong(2,accountId2)
                     statement.executeUpdate()
                 }
                 conn.commit()

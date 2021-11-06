@@ -19,20 +19,26 @@ class TransferPessimisticLock {
             val autoCommit = conn.autoCommit
             try {
                 conn.autoCommit = false
-                val prepareStatement1 = conn.prepareStatement("select * from account1 where id = $minId for update")
+                val prepareStatement1 = conn.prepareStatement("select * from account1 where id = ? for update")
                 prepareStatement1.use { statement ->
+                    statement.setLong(1, minId)
                     statement.executeQuery()
                 }
-                val prepareStatement2 = conn.prepareStatement("select * from account1 where id = $maxId for update")
+                val prepareStatement2 = conn.prepareStatement("select * from account1 where id = ? for update")
                 prepareStatement2.use { statement ->
+                    statement.setLong(1, maxId)
                     statement.executeQuery()
                 }
-                val prepareStatement3 = conn.prepareStatement("update account1 set amount = amount - $amount where id = $minId")
+                val prepareStatement3 = conn.prepareStatement("update account1 set amount = amount - ? where id = ?")
                 prepareStatement3.use { statement ->
+                    statement.setLong(1,amount)
+                    statement.setLong(2,minId)
                     statement.executeUpdate()
                 }
-                val prepareStatement4 = conn.prepareStatement("update account1 set amount = amount + $amount where id = $maxId")
+                val prepareStatement4 = conn.prepareStatement("update account1 set amount = amount + ? where id = ?")
                 prepareStatement4.use { statement ->
+                    statement.setLong(1,amount)
+                    statement.setLong(2,maxId)
                     statement.executeUpdate()
                 }
                 conn.commit()
